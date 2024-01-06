@@ -1,0 +1,162 @@
+{% extends "templates/base.html" %}
+{% from "www/macros/livecode.html" import LiveCodeEditorLarge, LiveCodeEditorJS with context %}
+
+{% block title %}{{sketch.title}}{% endblock %}
+{% block head_include %}
+<meta name="description" content="Sketch {{sketch.title}}" />
+<meta name="keywords" content="sketch {{sketch.title}}" />
+<style>
+</style>
+
+<link rel="stylesheet" href="/assets/mon_school/codemirror/lib/codemirror.css">
+
+<script src="/assets/mon_school/codemirror/lib/codemirror.js"></script>
+<script src="/assets/mon_school/codemirror/mode/python/python.js"></script>
+<script src="/assets/mon_school/codemirror/keymap/sublime.js"></script>
+
+<script src="/assets/mon_school/codemirror/addon/edit/matchbrackets.js"></script>
+<script src="/assets/mon_school/codemirror/addon/comment/comment.js"></script>
+{% endblock %}
+
+{% block content %}
+<section class="top-section" style="padding: 1rem 0rem;">
+  <div class='container pb-5'>
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item" aria-current="page"><a href="/sketches">Sketches</a></li>
+      </ol>
+    </nav>
+
+    <div class="sketch-header">
+
+      {% if sketch.name %}
+        {% set metrics = sketch.get_metrics() %}
+        <div class="sketch-like-wrapper">
+
+          {% if frappe.session.user and sketch.is_liked_by(frappe.session.user) %}
+          <button class="button-links like-button liked btn btn-link d-inline m-0 p-0 text-decoration-none" data-sketch-name="{{ sketch.name }}">
+            <img class="icon-background like-icon" src="/assets/mon_school/icons/red-like.svg" style="width: 30px; height: auto;" />
+            <span id="like-count">{{ metrics.get('likes', 0) }}</span>
+          </button>
+
+          {% else %}
+
+          <button class="button-links like-button not-liked btn btn-link d-inline m-0 p-0 text-decoration-none" data-sketch-name="{{ sketch.name }}">
+            <img class="icon-background like-icon" src="/assets/lms/icons/like.svg" style="width: 30px; height: auto;" />
+            <span id="like-count">{{ metrics.get('likes', 0) }}</span>
+          </button>
+          {% endif %}
+
+        </div>
+      {% endif %}
+
+      {% if editable %}
+      <div class="d-flex">
+        <input type="text" id="sketch-title" name="title" class="form-control" placeholder="Sketch Title"
+        {% if sketch.title %} value="{{ sketch.title }}" {% endif %}>
+        <button type="submit" id="sketch-save" class="btn-save btn btn-primary ml-2">Save</button>
+      </div>
+      {% else %}
+      <h1 class="sketch-title">{{sketch.title | e}}</h1>
+      <div class="sketch-owner-wrapper">By <span class="sketch-owner">{{sketch.get_owner_name() | e}}</span></div>
+      {% endif %}
+    </div>
+
+    {% if sketch.is_new() and not editable %}
+    <div class="alert alert-warning">
+      Please login to save this sketch.
+    </div>
+    {% endif %}
+
+    {% if sketch.runtime == "sketch" %}
+    <div class="alert alert-warning">
+      This sketch was created using an old version of the library.
+    </div>
+    {% endif %}
+
+    <div class="sketch-editor">
+      {{LiveCodeEditorLarge(sketch.name, sketch.code, runtime=sketch.runtime, image=sketch.svg) }}
+    </div>
+
+  </div>
+</section>
+
+{% if sketch.name %}
+<a name="comments"></a>
+<div class="container">
+  {% set doctype, docname = "LMS Sketch", sketch.name %}
+  {% set title = "Comments" %}
+  {% set cta_title = "New Comment" %}
+  {% set single_thread = True %}
+  {% include "frappe/templates/discussions/discussions_section.html" %}
+</div>
+{% endif %}
+
+{% endblock %}
+
+{%- block script %}
+{{ super() }}
+
+<script type="text/javascript">
+  var page_context = {{ page_context | tojson }};
+</script>
+
+{{ LiveCodeEditorJS() }}
+
+<script type="text/javascript">
+  var sketch_name = {{ sketch.name | tojson }};
+
+  function saveSketch() {
+    var title = $("#sketch-title").val()
+    var code = livecodeEditors[0].codemirror.doc.getValue()
+
+    frappe.call('mon_school.mon_school.doctype.lms_sketch.lms_sketch.save_sketch', {
+      name: sketch_name,
+      title: title,
+      code: code
+    })
+      .then(r => {
+        var msg = r.message;
+        if (!msg.ok) {
+          var error = msg.error || "Save failed."
+          frappe.msgprint({
+            "title": "Error",
+            "indicator": "red",
+            "message": error
+          });
+        }
+        else if (msg.status == "created") {
+          var path = "/sketches/" + msg.id;
+          var url = window.location.protocol + "//" + window.location.host + path
+          window.history.pushState({ path: url }, '', url);
+          sketch_name = msg.name;
+
+          frappe.msgprint({
+            "title": "Notification",
+            "indicator": "green",
+            "message": "New sketch has been saved!"
+          });
+        }
+        else if (msg.status == "updated") {
+          frappe.msgprint({
+            "title": "Notification",
+            "indicator": "green",
+            "message": "The sketch has been saved!"
+          });
+        }
+        setTimeout(() => {
+          window.location.reload();
+        }, 3000)
+      })
+  }
+
+  $(function () {
+    $("#sketch-save").click(function () {
+      saveSketch();
+    });
+  })
+</script>
+
+{{ include_script('sketch_like.bundle.js') }}
+
+{%- endblock %}

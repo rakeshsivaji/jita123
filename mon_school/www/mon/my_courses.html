@@ -1,0 +1,78 @@
+{% extends "templates/base.html" %}
+
+{% block title %}My Courses - Mon School{% endblock %}
+
+{% block head_include %}
+	<meta name="description" content="My Courses" />
+	<meta name="keywords" content="courses mon school" />
+  <style type="text/css">
+    h4.course-subtitle {
+      font-size: 1.0em;
+      color: #888;
+    }
+
+  </style>
+{% endblock %}
+
+{% block content %}
+<section class="top-section" style="padding: 1rem 0rem;">
+  <div class='container pb-5'>
+	<h1>My Courses</h1>
+    {% if not user %}
+      <div class="alert alert-warning">
+        <p>Please Login to access your courses.</p>
+        <p><a class="btn btn-primary" href="/login?next=my-courses">Login Now</a></p>
+      </div>
+    {% elif not memberships %}
+    <div class="alert alert-warning">
+      <p>You have not joined any courses yet.</p>
+
+      <p><a class="btn btn-primary" href="/">Explore Courses</a></p>
+    </div>
+    {% else %}
+      <div class="row">
+        {% for m in memberships %}
+          <div class="col-md-4">
+            {{ CourseTeaser(m.course, m.batch, m.member_type)}}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}
+
+
+{% macro CourseTeaser(course, batch, member_type) %}
+{% if batch and member_type != "student" %}
+  {% set query = {"batch" : batch.name} %}
+{% else %}
+  {% set query = {} %}
+{% endif %}
+
+<div class="course-teaser card">
+  <div class="course-body card-body">
+    <h3 class="course-title card-title"><a href="/courses/{{ course.name }}?{{ query | urlencode }}">{{ course.title }}</a></h3>
+    {% if batch %}
+      <h4 class="course-subtitle">{{ batch.title }}</h4>
+    {% endif %}
+    <div class="course-intro">
+      {{ course.short_introduction or "" }}
+    </div>
+  </div>
+  <div class="course-footer card-footer">
+    {% if member_type == "Mentor" %}
+      <a class="btn btn-secondary pull-right" href="/mon/progress?{{ query | urlencode }}">Progress</a>
+    {% endif %}
+
+    <a class="btn btn-secondary" href="/courses/{{course.name}}/learn?{{ query | urlencode }}">Resume Course</a>
+  </div>
+</div>
+
+<style type="text/css">
+  .course-teaser {
+    margin: 20px 0px;
+  }
+</style>
+{% endmacro %}
+

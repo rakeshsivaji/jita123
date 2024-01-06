@@ -1,0 +1,100 @@
+{
+ "actions": [
+  {
+   "action": "mon_school.mon_school.doctype.lms_sketch.lms_sketch.generate_images",
+   "action_type": "Server Action",
+   "group": "Generate Images",
+   "label": "Using Cairosvg (default)"
+  },
+  {
+   "action": "mon_school.mon_school.doctype.lms_sketch.lms_sketch.generate_images_with_svgexport",
+   "action_type": "Server Action",
+   "group": "Generate Images",
+   "label": "Using svgexport"
+  }
+ ],
+ "autoname": "format:SKETCH-{#}",
+ "creation": "2021-03-09 16:31:50.523524",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "title",
+  "runtime",
+  "code",
+  "svg",
+  "image_ready"
+ ],
+ "fields": [
+  {
+   "fieldname": "title",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Title",
+   "reqd": 1
+  },
+  {
+   "fieldname": "runtime",
+   "fieldtype": "Data",
+   "label": "Runtime"
+  },
+  {
+   "fieldname": "code",
+   "fieldtype": "Code",
+   "label": "Code"
+  },
+  {
+   "fieldname": "svg",
+   "fieldtype": "Code",
+   "label": "SVG",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "image_ready",
+   "fieldtype": "Check",
+   "label": "Image Ready?"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2022-12-27 12:20:26.694045",
+ "modified_by": "Administrator",
+ "module": "Mon School",
+ "name": "LMS Sketch",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "if_owner": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "All",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1,
+ "track_views": 1
+}

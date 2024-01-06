@@ -1,0 +1,174 @@
+<script type="text/javascript" src="/assets/frappe/node_modules/moment/min/moment-with-locales.min.js"></script>
+<script type="text/javascript" src="/assets/frappe/node_modules/moment-timezone/builds/moment-timezone-with-data.min.js"></script>
+<script type="text/javascript" src="/assets/frappe/js/frappe/utils/datetime.js"></script>
+
+<script type="text/javascript">
+    // comment_when is failing because of this
+    if (!frappe.sys_defaults) {
+      frappe.sys_defaults = {}
+    }
+
+    // XXX-ANAND: Fix this later
+    if (!frappe.boot) {
+      frappe.boot = {}
+    }
+    if (!frappe.boot.time_zone) {
+      frappe.boot.time_zone = { system: "Asia/Kolkata", user: "Asia/Kolkata" };
+    }
+
+</script>
+
+{{ include_script("livecode-joy.bundle.js") }}
+{{ include_script("livecode.bundle.js") }}
+
+<script type="text/javascript">
+  $(function() {
+    if (page_context.course == "the-joy-of-programming") {
+      setupJoy();
+    }
+    else {
+      livecode.base_url = "{{ livecode_url }}";
+      livecode.setup();
+    }
+  });
+</script>
+
+{% set course_scripts = frappe.get_all("Course Script", filters={"course": course.name}, fields="*") %}
+{% if course_scripts %}
+  <script type="text/javascript">
+    {{ course_scripts[0].javascript }}
+  </script>
+  <style type="text/css">
+    {{ course_scripts[0].css }}
+  </style>
+{% endif %}
+
+<script type="text/javascript">
+// Fix the style of the additonal buttons added
+$(function() {
+  console.log("fix buttons");
+  $(".livecode-editor").find(".run").addClass("button");
+});
+</script>
+
+<style type="text/css">
+  .svg-image {
+    border: 5px solid #ddd;
+    position: relative;
+    z-index: 0;
+    width: 310px;
+    height: 310px;
+  }
+  .livecode-editor {
+    margin: 24px -25px;
+    background: var(--gray-50);
+  }
+
+
+  /* work-in-progress styles for showing admonition */
+  .admonition {
+    border: 1px solid #aaa;
+    border-left: .5rem solid #888;
+    border-radius: .3em;
+    font-size: 0.9em;
+    margin: 1.5em 0;
+    padding: 0 0.5em;
+  }
+  .admonition-title {
+    padding: 0.5em 0px;
+    font-weight: bold;
+    padding-top:
+  }
+
+  .livecode-editor .controls {
+    padding: 2px 4px 16px 4px;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    background: var(--gray-50);
+  }
+
+  .livecode-editor .controls button.button {
+    margin: 0px 12px;
+  }
+
+  .livecode-editor .CodeMirror {
+    border: none;
+    background: var(--gray-50);
+    color: var(--gray-900);
+  }
+
+  .livecode-editor .CodeMirror {
+    padding: 0px;
+    height: auto;
+  }
+  .livecode-editor .CodeMirror-scroll {
+    max-height: auto;
+    min-height: auto;
+  }
+
+  .CodeMirror pre.CodeMirror-line, .CodeMirror pre.CodeMirror-line-like {
+    padding: 0px 16px;
+  }
+
+  .CodeMirror-linenumber {
+    padding: 0px 16px 0px 8px;
+    background: var(--gray-400);
+    color: #192734;
+  }
+
+  .CodeMirror-gutter {
+    background: var(--gray-400);
+  }
+
+  .canvas-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--gray-50);
+    padding: 10px 0px;
+  }
+  .output-bar {
+    padding: 16px;
+    background: var(--yellow-100);
+    color: var(--gray-900);
+  }
+  .livecode-editor pre.output {
+    position: relative;
+    width: auto;
+    padding: 0px;
+    margin-bottom: 0px;
+  }
+
+  span.output-label {
+    font-weight: bold;
+  }
+  .tiny-button {
+    padding: 4px 8px;
+    margin-top: -2px;
+  }
+  .output-wrapper {
+    padding: 10px 0px;
+  }
+  .filenames {
+    padding: 10px;
+  }
+  .filenames .file-link {
+    border: none;
+    border-radius: 16px;
+    padding: 3px 12px;
+    margin: 0px 5px;
+  }
+  .filenames .file-link.active {
+    background: var(--primary);
+    color: white;
+    font-weight: bold;
+  }
+  .livecode-editor .labels {
+    padding: 3px 6px;
+    background: #eee;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    color: inherit;
+  }
+</style>

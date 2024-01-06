@@ -1,0 +1,61 @@
+{% extends "templates/base.html" %}
+{% from "www/macros/livecode.html" import LiveCodeEditor, LiveCodeEditorJS %}
+{% from "www/macros/sketch_card.html" import sketch_card %}
+
+{% block title %}Sketches{% endblock %}
+{% block head_include %}
+<meta name="description" content="Sketches" />
+<meta name="keywords" content="sketches" />
+{% endblock %}
+
+{% block content %}
+<div class="common-page-style">
+  <div class='container'>
+    <div class="sketch-page-header">
+      <a href="/sketches/new" class="btn btn-primary pull-right">{{ _("Submit a Sketch") }} </a>
+      <div>
+        <span class="course-home-headings">{{ _("Sketches") }}</span>
+        <p class=""> {{ _("Learn programming by creating innovative sketches. ") }} </p>
+      </div>
+    </div>
+    <div class="sketch-list">
+      {% for sketch in sketches %}
+      {{ sketch_card(sketch, True, widgets) }}
+      {% endfor %}
+    </div>
+    <div class="mt-5">
+      {{ Paginate(page, num_pages) }}
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% macro Paginate(page, num_pages) %}
+<nav aria-label="Page navigation">
+  <ul class="pagination justify-content-center">
+    <li class="page-item {{'disabled' if page==1 else ''}}">
+      <a class="page-link" href="/sketches?page={{page-1}}" aria-label="Previous">
+        <span aria-hidden="true">&lsaquo; {{ _("Previous") }}</span>
+        <span class="sr-only">{{ _("Previous") }}</span>
+      </a>
+    </li>
+    {% for i in range(page_range_start, page_range_end) %}
+      <li class="page-item {{'disabled' if i==page else ''}}">
+        <a class="page-link" href="/sketches?page={{i}}">{{i}}</a>
+      </li>
+    {% endfor %}
+    <li class="page-item {{'disabled' if page==num_pages else ''}}">
+      <a class="page-link" href="/sketches?page={{page+1}}" aria-label="Next">
+        <span aria-hidden="true"> {{ _("Next") }}  &rsaquo;</span>
+        <span class="sr-only">{{ _("Next") }}</span>
+      </a>
+    </li>
+  </ul>
+</nav>
+{% endmacro %}
+
+{% block script %}
+
+{{ include_script('sketch_like.bundle.js') }}
+
+{% endblock %}

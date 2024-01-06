@@ -1,0 +1,130 @@
+
+{% macro LiveCodeEditorLarge(name, code, runtime="joy", image=None) %}
+  <div class="livecode-editor livecode-editor-large" id="editor-{{name}}"
+      data-runtime="{{ runtime }}">
+    <div class="row">
+      <div class="col-lg-8 col-md-6">
+        <div class="controls">
+          <button class="run">Run</button>
+          <span class="run-status"></span>
+        </div>
+      </div>
+    </div>
+    <div class="code-editor">
+      <div class="row">
+        <div class="col-lg-8 col-md-6">
+          <div class="code-wrapper">
+            <textarea class="code">{{code}}</textarea>
+          </div>
+        </div>
+        <div class="col-lg-4 col-md-6 canvas-wrapper">
+            <div class="svg-image" width="300" height="300">
+              {% if image %}
+                {{ image }}
+              {% else %}
+                <svg width="300" height="300" viewBox="-150 -150 300 300" fill="none" stroke="black" xmlns="http://www.w3.org/2000/svg">
+                </svg>
+              {% endif %}
+            </div>
+            <pre class="output"></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endmacro %}
+
+{% macro LiveCodeEditor(name, code, reset_code, is_exercise=False, last_submitted=None, image=None) %}
+<div class="livecode-editor livecode-editor-inline" id="editor-{{name}}">
+  <div class="row">
+    <div class="col-lg-8 col-md-6">
+      <div class="controls">
+        <button class="run">Run</button>
+        <button class="reset">Reset</button>
+        <span class="run-status"></span>
+        {% if is_exercise %}
+          <button class="submit pull-right btn-primary">Submit</button>
+          {% if last_submitted %}
+          <span class="pull-right" style="padding-right: 10px;"><span class="human-time" data-timestamp="{{last_submitted}}"></span></span>
+          {% endif %}
+        {% endif %}
+      </div>
+      <div style="display: none">
+        <pre class="reset-code">{{reset_code}}</pre>
+      </div>
+    </div>
+  </div>
+  <div class="code-editor">
+    <div class="row">
+      <div class="col-lg-8 col-md-6">
+        <div class="code-wrapper">
+          <textarea class="code">{{code}}</textarea>
+        </div>
+      </div>
+      <div class="col-lg-4 col-md-6 canvas-wrapper">
+        <div class="svg-image svg-image-small">
+          {% if image %}
+            {{ image }}
+          {% else %}
+            <svg width="300" height="300" viewBox="-150 -150 300 300" fill="none" stroke="black" xmlns="http://www.w3.org/2000/svg">
+            </svg>
+          {% endif %}
+        </div>
+        <pre class="output"></pre>
+      </div>
+    </div>
+  </div>
+</div>
+{% endmacro %}
+
+
+
+{% macro LiveCodeEditorJS(name, code) %}
+
+<script type="text/javascript" src="/assets/mon_school/js/livecode-editor.js"></script>
+
+<script type="text/javascript">
+  var livecodeEditors = [];
+  var livecodeEditorsMap = {};
+
+  $(function() {
+    $(".livecode-editor").each((i, e) => {
+      var name = e.id.replace("editor-", "");
+
+      var editor = new LiveCodeEditor(e, {
+        codemirror: true,
+        runtime: $(e).data("runtime"),
+        context: page_context,
+        hideImageOnRun: false
+      });
+      livecodeEditors.push(editor);
+      livecodeEditorsMap[e.id] = editor;
+    });
+  });
+</script>
+
+<style type="text/css">
+  .svg-image {
+    border: 5px solid #ddd;
+    position: relative;
+    z-index: 0;
+    width: 310px;
+    height: 310px;
+  }
+  .livecode-editor {
+    margin-bottom: 30px;
+  }
+  .svg-image-small {
+    border: 5px solid #ddd;
+    position: relative;
+    z-index: 0;
+    width: 160px;
+    height: 160px;
+  }
+  .svg-image-small svg {
+    width: 150px;
+    height: 150px
+  }
+</style>
+
+{% endmacro %}
